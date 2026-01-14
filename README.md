@@ -2,4 +2,4 @@
 
 # Link to Our Team Charter :
 
-https://docs.google.com/document/d/1uo-JxU22X7lCWvvfE2H2vEjCgzgKLKmi7KpLzvvnpco/edit?pli=1&tab=t.0
+The project involves designing and developing creating a Flask-based web application that allows users to organize and manage information in the form of a task tracker or a similar tool for managing tasks, notes, study plans, or other records.
