@@ -1,11 +1,10 @@
 # IT111Gr5
 
-# Project Overview :
+# Project Overview:
 
 The project involves designing and developing creating a Flask-based web application that allows users to organize and manage information in the form of a task tracker or a similar tool for managing tasks, notes, study plans, or other records.
 
-# Project Name
-# Task  Tracker (Productivity Web App)
+# Project Name: Task  Tracker (Productivity Web App)
 
 #Short Overview
 
