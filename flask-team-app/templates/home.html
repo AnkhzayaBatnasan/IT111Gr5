@@ -1,1 +1,28 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Task List</title>
+  </head>
+  <body>
+    <h1>Task List</h1>
 
+    {% if tasks and tasks|length > 0 %}
+      <ul>
+        {% for task in tasks %}
+          <li>
+            <strong>{{ task.title }}</strong>
+            — {{ task.status }}
+            <br />
+            <em>{{ task.memo }}</em>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p><em>No tasks yet.</em></p>
+    {% endif %}
+
+    <!-- TODO (TEAM): Add Task form (US2) -->
+    <!-- TODO (TEAM): Toggle/Delete buttons (US3/US4) -->
+  </body>
+</html>
