@@ -1,28 +1,107 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Task List</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Task Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
   </head>
+
   <body>
-    <h1>Task List</h1>
+    <div class="container">
+      <!-- Top Nav -->
+      <div class="nav">
+        <div class="brand">
+          <div class="logo"></div>
+          <div>
+            Task Tracker<br />
+            <span style="color:var(--muted); font-weight:500; font-size:12px;">Simple productivity web app</span>
+          </div>
+        </div>
+        <div class="pill">IT111 Group Project</div>
+      </div>
 
-    {% if tasks and tasks|length > 0 %}
-      <ul>
-        {% for task in tasks %}
-          <li>
-            <strong>{{ task.title }}</strong>
-            — {{ task.status }}
-            <br />
-            <em>{{ task.memo }}</em>
-          </li>
-        {% endfor %}
-      </ul>
-    {% else %}
-      <p><em>No tasks yet.</em></p>
-    {% endif %}
+      <!-- Hero -->
+      <div class="hero">
+        <h1>Stay on top of your work.</h1>
+        <p>
+          Track what you need to do, see what’s completed, and keep everything in one place.
+          No accounts, no database — just simple tasks.
+        </p>
+      </div>
 
-    <!-- TODO (TEAM): Add Task form (US2) -->
-    <!-- TODO (TEAM): Toggle/Delete buttons (US3/US4) -->
+      <div class="grid">
+        <!-- Tasks -->
+        <div class="card">
+          <div class="cardHeader">
+            <div style="font-weight:700;">Your Tasks</div>
+            <div class="stats">
+              <span class="pill">Total: <b style="color:var(--text)">{{ total }}</b></span>
+              <span class="pill">Complete: <b style="color:var(--text)">{{ complete }}</b></span>
+              <span class="pill">Incomplete: <b style="color:var(--text)">{{ incomplete }}</b></span>
+            </div>
+          </div>
+
+          <div class="cardBody">
+            {% if tasks and tasks|length > 0 %}
+              {% for task in tasks %}
+                <div class="task">
+                  <div>
+                    <p class="taskTitle">{{ task.title }}</p>
+                    {% if task.memo %}
+                      <p class="taskMemo">{{ task.memo }}</p>
+                    {% else %}
+                      <p class="taskMemo"><em>No notes.</em></p>
+                    {% endif %}
+                  </div>
+
+                  <div>
+                    {% if task.status == "complete" %}
+                      <span class="badge complete">Complete</span>
+                    {% else %}
+                      <span class="badge incomplete">Incomplete</span>
+                    {% endif %}
+                  </div>
+                </div>
+              {% endfor %}
+            {% else %}
+              <div class="empty">
+                <b>No tasks yet.</b><br/>
+                Add a few tasks to get started.
+              </div>
+            {% endif %}
+
+            <!-- TODO (TEAM): Add Task form (US2) -->
+            <!-- TODO (TEAM): Toggle/Delete buttons (US3/US4) -->
+          </div>
+        </div>
+
+        <!-- Side panel -->
+        <div class="card">
+          <div class="cardHeader">
+            <div style="font-weight:700;">How it works</div>
+            <div class="pill">MVP</div>
+          </div>
+          <div class="cardBody">
+            <p style="margin:0 0 10px 0; color:var(--muted); line-height:1.5;">
+              This app loads tasks from a JSON file and shows them here on the home page.
+              Next steps are adding a form to create tasks, toggling completion, and deleting tasks.
+            </p>
+
+            <div class="pill">✅ View tasks (US1)</div>
+            <div style="height:10px"></div>
+            <div class="pill">🧩 Add task (US2) — next</div>
+            <div style="height:10px"></div>
+            <div class="pill">🔁 Toggle (US3) — next</div>
+            <div style="height:10px"></div>
+            <div class="pill">🗑 Delete (US4) — next</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        Built with Flask • Data stored in <code>data/tasks.json</code>
+      </div>
+    </div>
   </body>
 </html>

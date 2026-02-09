@@ -67,14 +67,20 @@ def load_tasks() -> list[dict[str, Any]]:
 
 @app.get("/")
 def home_page():
-    """
-    US1 Home Page:
-    - Shows list of tasks
-    - Each task shows at least: title + status
-    - If none exist, show a message
-    """
     tasks = load_tasks()
-    return render_template("home.html", tasks=tasks)
+
+    total = len(tasks)
+    complete = sum(1 for t in tasks if t.get("status") == "complete")
+    incomplete = total - complete
+
+    return render_template(
+        "home.html",
+        tasks=tasks,
+        total=total,
+        complete=complete,
+        incomplete=incomplete,
+    )
+
 
 
 # -----------------------------------------------------------------------------
