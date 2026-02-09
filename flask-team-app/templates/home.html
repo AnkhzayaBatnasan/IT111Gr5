@@ -15,37 +15,48 @@
           <img
             class="logo"
             src="{{ url_for('static', filename='nsc-logo.svg') }}"
-            alt="App Logo"/>
+            alt="App Logo"
+          />
           <div>
             Task Tracker<br />
-            <span style="color:var(--muted); font-weight:500; font-size:12px;">North Seattle College</span>
+            <span style="color:var(--muted); font-weight:500; font-size:12px;">
+              Simple productivity web app
+            </span>
           </div>
         </div>
+
         <div class="pill">IT111 Group Project</div>
       </div>
 
-      <!-- Hero -->
-      <div class="hero">
-        <h1>Stay on top of your work.</h1>
-        <p>
-          Track what you need to do, see what’s completed, and keep everything in one place.
-          No accounts, no database — just simple tasks.
-        </p>
-      </div>
-
-      <div class="grid">
-        <!-- Tasks -->
-        <div class="card">
-          <div class="cardHeader">
-            <div style="font-weight:700;">Your Tasks</div>
-            <div class="stats">
-              <span class="pill">Total: <b style="color:var(--text)">{{ total }}</b></span>
-              <span class="pill">Complete: <b style="color:var(--text)">{{ complete }}</b></span>
-              <span class="pill">Incomplete: <b style="color:var(--text)">{{ incomplete }}</b></span>
+      <!-- Compact header -->
+      <div class="card">
+        <div class="cardBody" style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+          <div>
+            <div style="font-weight:800; font-size:18px;">Dashboard</div>
+            <div style="color:var(--muted); font-size:13px;">
+              Desktop: fixed app layout. Mobile: page scrolls naturally.
             </div>
           </div>
 
-          <div class="cardBody">
+          <div class="stats">
+            <span class="pill">Total: <b style="color:var(--text)">{{ total }}</b></span>
+            <span class="pill">Complete: <b style="color:var(--text)">{{ complete }}</b></span>
+            <span class="pill">Incomplete: <b style="color:var(--text)">{{ incomplete }}</b></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main layout -->
+      <div class="main">
+        <!-- Tasks panel -->
+        <div class="card">
+          <div class="cardHeader">
+            <div style="font-weight:700;">Your Tasks</div>
+            <div class="pill">Home</div>
+          </div>
+
+          <!-- ✅ Scroll happens here (inside the tasks panel) -->
+          <div class="cardBody scrollArea">
             {% if tasks and tasks|length > 0 %}
               {% for task in tasks %}
                 <div class="task">
@@ -73,37 +84,30 @@
                 Add a few tasks to get started.
               </div>
             {% endif %}
-
-            <!-- TODO (TEAM): Add Task form (US2) -->
-            <!-- TODO (TEAM): Toggle/Delete buttons (US3/US4) -->
           </div>
         </div>
 
-        <!-- Side panel -->
+        <!-- Right panel -->
         <div class="card">
           <div class="cardHeader">
-            <div style="font-weight:700;">How it works</div>
+            <div style="font-weight:700;">Quick Info</div>
             <div class="pill">MVP</div>
           </div>
+
           <div class="cardBody">
             <p style="margin:0 0 10px 0; color:var(--muted); line-height:1.5;">
-              This app loads tasks from a JSON file and shows them here on the home page.
-              Next steps are adding a form to create tasks, toggling completion, and deleting tasks.
+              This app loads tasks from <code>data/tasks.json</code>. Next steps: add tasks, toggle complete, delete.
             </p>
 
             <div class="pill">✅ View tasks (US1)</div>
             <div style="height:10px"></div>
-            <div class="pill">🧩 Add task (US2) — next</div>
+            <div class="pill">🧩 Add task (US2)</div>
             <div style="height:10px"></div>
-            <div class="pill">🔁 Toggle (US3) — next</div>
+            <div class="pill">🔁 Toggle (US3)</div>
             <div style="height:10px"></div>
-            <div class="pill">🗑 Delete (US4) — next</div>
+            <div class="pill">🗑 Delete (US4)</div>
           </div>
         </div>
-      </div>
-
-      <div class="footer">
-        Built with Flask • Data stored in <code>data/tasks.json</code>
       </div>
     </div>
   </body>
