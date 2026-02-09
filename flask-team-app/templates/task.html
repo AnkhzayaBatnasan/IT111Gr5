@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Task</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+<div class="container">
+  <div class="nav">
+    <div class="brand">
+      <img class="logo" src="{{ url_for('static', filename='nsc-logo.svg') }}">
+      <div>Task Tracker</div>
+    </div>
+    <a class="pill" href="/">Back</a>
+  </div>
+
+  <div class="card">
+    <div class="cardHeader">
+      <b>{{ task.title }}</b>
+      <span class="badge {{ task.status }}">{{ task.status }}</span>
+    </div>
+    <div class="cardBody">
+      <p>{{ task.memo }}</p>
+      <form method="POST" action="/tasks/{{ task.id }}/toggle">
+        <button class="pill">Toggle Status</button>
+      </form>
+      <form method="POST" action="/tasks/{{ task.id }}/delete">
+        <button class="pill">Delete</button>
+      </form>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -57,6 +57,14 @@
 
           <!-- ✅ Scroll happens here (inside the tasks panel) -->
           <div class="cardBody scrollArea">
+            <form method="POST" action="/tasks/add" style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:12px;">
+              <input name="title" placeholder="Task title..." required
+                     style="flex:1; min-width:220px; padding:10px; border-radius:12px; border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.04); color:var(--text);" />
+              <input name="memo" placeholder="Optional memo..."
+                     style="flex:2; min-width:260px; padding:10px; border-radius:12px; border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.04); color:var(--text);" />
+              <button class="pill" type="submit" style="border:none;">Add</button>
+            </form>
+
             {% if tasks and tasks|length > 0 %}
               {% for task in tasks %}
                 <div class="task">
@@ -75,6 +83,18 @@
                     {% else %}
                       <span class="badge incomplete">Incomplete</span>
                     {% endif %}
+
+                    <div class="taskActions">
+                      <a class="pill" href="/tasks/{{ task.id }}" style="text-decoration:none;">View</a>
+
+                      <form method="POST" action="/tasks/{{ task.id }}/toggle" style="margin:0;">
+                        <button class="pill" type="submit" style="border:none;">Toggle</button>
+                      </form>
+
+                      <form method="POST" action="/tasks/{{ task.id }}/delete" style="margin:0;" onsubmit="return confirm('Delete this task?');">
+                        <button class="pill" type="submit" style="border:none;">Delete</button>
+                      </form>
+                    </div>
                   </div>
                 </div>
               {% endfor %}

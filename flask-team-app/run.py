@@ -1,78 +1,47 @@
-from __future__ import annotations
-
+from flask import Flask, render_template, request, redirect, url_for, abort
 import json
 from pathlib import Path
-from typing import Any
-
-from flask import Flask, render_template
 
 app = Flask(__name__)
 
-# -----------------------------------------------------------------------------
-# Data file (adjust path if your structure is different)
-# -----------------------------------------------------------------------------
-BASE_DIR = Path(__file__).resolve().parent
-DATA_DIR = BASE_DIR / "data"
-TASKS_FILE = DATA_DIR / "tasks.json"
+DATA_PATH = Path("data/tasks.json")
 
 
-def load_tasks() -> list[dict[str, Any]]:
-    """
-    US1: Load tasks from data/tasks.json.
-
-    Each record example:
-      {
-        "id": 1,
-        "title": "IT 111 Reading",
-        "status": "incomplete",
-        "memo": "Read chapters on Lambda Functions"
-      }
-    """
-    if not TASKS_FILE.exists():
+def load_tasks():
+    if not DATA_PATH.exists():
         return []
-
     try:
-        with TASKS_FILE.open("r", encoding="utf-8") as f:
-            data = json.load(f)
-
-        if not isinstance(data, list):
-            return []
-
-        tasks: list[dict[str, Any]] = []
-        for t in data:
-            if not isinstance(t, dict):
-                continue
-
-            title = str(t.get("title", "")).strip()
-            status = str(t.get("status", "incomplete")).strip().lower()
-            memo = str(t.get("memo", "")).strip()
-
-            if status not in ("complete", "incomplete"):
-                status = "incomplete"
-
-            tasks.append(
-                {
-                    "id": t.get("id"),
-                    "title": title,
-                    "status": status,
-                    "memo": memo,
-                }
-            )
-
-        return tasks
-
-    except (OSError, json.JSONDecodeError):
+        with DATA_PATH.open("r", encoding="utf-8") as f:
+            return json.load(f)
+    except json.JSONDecodeError:
         return []
+
+
+def save_tasks(tasks):
+    DATA_PATH.parent.mkdir(parents=True, exist_ok=True)
+    with DATA_PATH.open("w", encoding="utf-8") as f:
+        json.dump(tasks, f, indent=2)
+
+
+def next_id(tasks):
+    return max((t.get("id", 0) for t in tasks), default=0) + 1
+
+
+def compute_stats(tasks):
+    total = len(tasks)
+    complete = sum(1 for t in tasks if t.get("status") == "complete")
+    incomplete = total - complete
+    return total, complete, incomplete
+
+
+def find_task(tasks, task_id):
+    return next((t for t in tasks if t.get("id") == task_id), None)
 
 
 @app.get("/")
 def home_page():
     tasks = load_tasks()
-
-    total = len(tasks)
-    complete = sum(1 for t in tasks if t.get("status") == "complete")
-    incomplete = total - complete
-
+    total, complete, incomplete = compute_stats(tasks)
     return render_template(
         "home.html",
         tasks=tasks,
@@ -82,14 +51,53 @@ def home_page():
     )
 
 
+@app.post("/tasks/add")
+def add_task():
+    title = request.form.get("title", "").strip()
+    memo = request.form.get("memo", "").strip()
 
-# -----------------------------------------------------------------------------
-# TODO (TEAM) — placeholders only (not executed)
-# - Add Task (US2)
-# - Toggle Complete/Incomplete (US3)
-# - Delete Task (US4)
-# - Persistence improvements (Sprint 3+)
-# -----------------------------------------------------------------------------
+    if not title:
+        return redirect(url_for("home_page"))
+
+    tasks = load_tasks()
+    tasks.append({
+        "id": next_id(tasks),
+        "title": title,
+        "memo": memo,
+        "status": "incomplete"
+    })
+    save_tasks(tasks)
+    return redirect(url_for("home_page"))
+
+
+@app.post("/tasks/<int:task_id>/toggle")
+def toggle_task(task_id):
+    tasks = load_tasks()
+    task = find_task(tasks, task_id)
+    if not task:
+        abort(404)
+
+    task["status"] = "complete" if task["status"] != "complete" else "incomplete"
+    save_tasks(tasks)
+    return redirect(url_for("home_page"))
+
+
+@app.post("/tasks/<int:task_id>/delete")
+def delete_task(task_id):
+    tasks = load_tasks()
+    tasks = [t for t in tasks if t.get("id") != task_id]
+    save_tasks(tasks)
+    return redirect(url_for("home_page"))
+
+
+@app.get("/tasks/<int:task_id>")
+def view_task(task_id):
+    tasks = load_tasks()
+    task = find_task(tasks, task_id)
+    if not task:
+        abort(404)
+    return render_template("task.html", task=task)
+
 
 if __name__ == "__main__":
     app.run(debug=True)

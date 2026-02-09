@@ -1,3 +1,5 @@
+
+/* ===== Base variables ===== */
 :root{
   --bg:#0b1220;
   --panel:#0f1a30;
@@ -9,134 +11,206 @@
   --radius:16px;
 }
 
-*, *::before, *::after{box-sizing:border-box}
+/* ===== Reset ===== */
+*, *::before, *::after{
+  box-sizing:border-box;
+}
 
-html, body { height: 100%; }
+html, body{
+  height:100%;
+}
 
 body{
   margin:0;
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   background: radial-gradient(900px 500px at 20% 0%, #182a52 0%, var(--bg) 55%) fixed;
   color:var(--text);
-  overflow: hidden; /* desktop app feel */
+  overflow:hidden; /* desktop app feel */
 }
 
-a{color:inherit; text-decoration:none}
+a{ color:inherit; text-decoration:none; }
 
+/* ===== Layout ===== */
 .container{
-  height: 100dvh;              /* better than 100vh on modern browsers */
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  min-height: 0;               /* CRITICAL */
+  height:100dvh;
+  max-width:1100px;
+  margin:0 auto;
+  padding:18px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  min-height:0;
 }
 
 .nav{
-  display:flex; align-items:center; justify-content:space-between;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
   padding:14px 18px;
   border:1px solid var(--border);
   background: rgba(15,26,48,.65);
   backdrop-filter: blur(10px);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
 }
 
-.brand{display:flex; gap:10px; align-items:center; font-weight:700; letter-spacing:.2px}
+.brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight:700;
+}
 
 .logo{
   width:34px;
   height:34px;
   object-fit:contain;
   display:block;
-  filter: brightness(0) invert(1); /* ✅ makes dark logo white */
-  opacity: .95;
+  filter: brightness(0) invert(1); /* brighten logo on dark bg */
+  opacity:.95;
 }
 
 .pill{
-  display:inline-flex; gap:8px; align-items:center;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 12px;
+  font-size:13px;
+  border-radius:999px;
   border:1px solid var(--border);
   background: rgba(255,255,255,.05);
-  padding:8px 10px;
-  border-radius:999px;
   color:var(--muted);
-  font-size:13px;
 }
 
-.stats{display:flex; gap:10px; flex-wrap:wrap}
+.stats{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
 
-/* Main app area */
+/* ===== Main app area ===== */
 .main{
-  flex: 1;
-  min-height: 0;               /* CRITICAL */
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 14px;
+  flex:1;
+  min-height:0;
+  display:grid;
+  grid-template-columns:1fr;
+  gap:14px;
 }
 
-@media (min-width: 880px){
-  .main{ grid-template-columns: 2fr 1fr; }
+@media (min-width:880px){
+  .main{
+    grid-template-columns:2fr 1fr;
+  }
 }
 
-/* Cards */
+/* ===== Cards ===== */
 .card{
   border:1px solid var(--border);
   background: rgba(15,26,48,.55);
   backdrop-filter: blur(10px);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  overflow:hidden;
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
   display:flex;
   flex-direction:column;
-  min-height:0;                /* CRITICAL */
+  min-height:0;
+  overflow:hidden;
 }
 
 .cardHeader{
   padding:14px 16px;
   border-bottom:1px solid var(--border);
-  display:flex; justify-content:space-between; align-items:center;
-  flex: 0 0 auto;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
 }
 
 .cardBody{
   padding:14px 16px;
-  flex: 1 1 auto;              /* allow body to take remaining space */
-  min-height:0;                /* CRITICAL for nested scrolling */
+  flex:1;
+  min-height:0;
 }
 
-/* Scroll only inside panels, not the whole page */
+/* ===== Scroll area ===== */
 .scrollArea{
-  overflow-y: auto;
-  min-height: 0;
-  padding-bottom: 16px;        /* ✅ creates nice bottom breathing room */
+  overflow-y:auto;
+  min-height:0;
+  padding-bottom:16px;
 }
 
-/* Task list styling */
+/* Modern scrollbar */
+.scrollArea{
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,.22) rgba(255,255,255,.06);
+}
+.scrollArea::-webkit-scrollbar{ width:10px; }
+.scrollArea::-webkit-scrollbar-track{
+  background: rgba(255,255,255,.06);
+  border-radius:999px;
+}
+.scrollArea::-webkit-scrollbar-thumb{
+  background: rgba(255,255,255,.22);
+  border-radius:999px;
+  border:2px solid rgba(255,255,255,.06);
+}
+.scrollArea::-webkit-scrollbar-thumb:hover{
+  background: rgba(255,255,255,.32);
+}
+
+/* ===== Tasks ===== */
 .task{
-  padding:12px 12px;
-  border:1px solid var(--border);
-  background: rgba(12,22,41,.55);
-  border-radius:14px;
   display:flex;
   justify-content:space-between;
   gap:12px;
-  margin-bottom:12px;          /* ✅ more modern spacing */
+  padding:12px;
+  margin-bottom:12px;
+  border:1px solid var(--border);
+  border-radius:14px;
+  background: rgba(12,22,41,.55);
 }
 
-.taskTitle{font-weight:700; margin:0 0 4px 0}
-.taskMemo{margin:0; color:var(--muted); font-size:13px; line-height:1.35}
+/* 🔥 REQUIRED so ellipsis works in flexbox */
+.task > div:first-child{
+  min-width:0;
+}
 
+.taskTitle{
+  font-weight:700;
+  margin:0 0 4px 0;
+}
+
+/* One-line truncated memo */
+.taskMemo{
+  margin:0;
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.4;
+
+  display:block;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:100%;
+}
+
+/* ===== Badges ===== */
 .badge{
   font-size:12px;
   padding:4px 10px;
   border-radius:999px;
   border:1px solid var(--border);
 }
-.badge.complete{background: rgba(46,204,113,.16); color:#bff2d2; border-color: rgba(46,204,113,.35)}
-.badge.incomplete{background: rgba(241,196,15,.14); color:#ffeaa7; border-color: rgba(241,196,15,.35)}
+.badge.complete{
+  background: rgba(46,204,113,.16);
+  color:#bff2d2;
+  border-color: rgba(46,204,113,.35);
+}
+.badge.incomplete{
+  background: rgba(241,196,15,.14);
+  color:#ffeaa7;
+  border-color: rgba(241,196,15,.35);
+}
 
+/* ===== Empty state ===== */
 .empty{
   padding:16px;
   border:1px dashed rgba(255,255,255,.25);
@@ -145,33 +219,39 @@ a{color:inherit; text-decoration:none}
   background: rgba(255,255,255,.04);
 }
 
-/* Mobile: allow page scroll so nothing gets cut off on short screens */
-@media (max-width: 720px), (max-height: 760px){
-  body{ overflow: auto; }
-  .container{ height: auto; min-height: 100dvh; }
+/* ===== Mobile behavior ===== */
+@media (max-width:720px), (max-height:760px){
+  body{ overflow:auto; }
+  .container{
+    height:auto;
+    min-height:100dvh;
+  }
 }
 
-/* ===== Modern scrollbar (matches dark UI) ===== */
-/* Firefox */
-.scrollArea{
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255,255,255,.22) rgba(255,255,255,.06);
+/* ===== Task actions layout fix (keeps buttons consistent) ===== */
+.task > div:first-child{
+  flex: 1 1 auto;
+  min-width: 0; /* REQUIRED so ellipsis works in flexbox */
 }
 
-/* Chrome / Edge / Safari */
-.scrollArea::-webkit-scrollbar{
-  width: 10px;
-}
-.scrollArea::-webkit-scrollbar-track{
-  background: rgba(255,255,255,.06);
-  border-radius: 999px;
-}
-.scrollArea::-webkit-scrollbar-thumb{
-  background: rgba(255,255,255,.22);
-  border-radius: 999px;
-  border: 2px solid rgba(255,255,255,.06); /* gives the “pill” look */
-}
-.scrollArea::-webkit-scrollbar-thumb:hover{
-  background: rgba(255,255,255,.32);
+.task > div:last-child{
+  flex: 0 0 210px;         /* fixed width so buttons never jump */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
 }
 
+.taskActions{
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.taskActions .pill,
+.taskActions button.pill{
+  padding: 6px 10px;
+  font-size: 12px;
+  line-height: 1;
+}
