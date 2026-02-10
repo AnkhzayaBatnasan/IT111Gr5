@@ -1,12 +1,62 @@
 [
-  { "id": 1,  "title": "IT 111 Reading",        "status": "incomplete", "memo": "Read chapters on Lambda Functions" },
-  { "id": 2,  "title": "EET 137 Lab",           "status": "complete",   "memo": "Build Exercise X05 – Assemble BOE Shield-Bot chassis and prep servos" },
-  { "id": 3,  "title": "Math Homework",         "status": "incomplete", "memo": "Finish problems 12–25 (odd) and check answers" },
-  { "id": 4,  "title": "Python Quiz Review",    "status": "incomplete", "memo": "Review lists, dicts, and functions; practice 10 questions" },
-  { "id": 5,  "title": "Grocery Run",           "status": "complete",   "memo": "Buy eggs, rice, chicken, and coffee" },
-  { "id": 6,  "title": "Resume Update",         "status": "incomplete", "memo": "Add latest projects + GitHub links; update skills section" },
-  { "id": 7,  "title": "Team Standup Notes",    "status": "complete",   "memo": "Post today’s blockers and progress to the group channel" },
-  { "id": 8,  "title": "Flask Practice",        "status": "incomplete", "memo": "Build one route + template rendering example" },
-  { "id": 9,  "title": "EET 203 Study",         "status": "incomplete", "memo": "Review counters and timers; write 5 ladder logic examples" },
-  { "id": 10, "title": "Clean Desk",            "status": "complete",   "memo": "Organize parts, label bags, and throw away scraps" }
+  {
+    "id": 1,
+    "title": "IT 111 Reading",
+    "status": "complete",
+    "memo": "Read chapters on Lambda Functions"
+  },
+  {
+    "id": 2,
+    "title": "EET 137 Lab",
+    "status": "complete",
+    "memo": "Build Exercise X05 \u2013 Assemble BOE Shield-Bot chassis and prep servos"
+  },
+  {
+    "id": 3,
+    "title": "Math Homework",
+    "status": "incomplete",
+    "memo": "Finish problems 12\u201325 (odd) and check answers"
+  },
+  {
+    "id": 4,
+    "title": "Python Quiz Review",
+    "status": "complete",
+    "memo": "Review lists, dicts, and functions; practice 10 questions"
+  },
+  {
+    "id": 5,
+    "title": "Grocery Run",
+    "status": "incomplete",
+    "memo": "Buy eggs, rice, chicken, and coffee"
+  },
+  {
+    "id": 6,
+    "title": "Resume Update",
+    "status": "incomplete",
+    "memo": "Add latest projects + GitHub links; update skills section"
+  },
+  {
+    "id": 7,
+    "title": "Team Standup Notes",
+    "status": "complete",
+    "memo": "Post today\u2019s blockers and progress to the group channel"
+  },
+  {
+    "id": 8,
+    "title": "Flask Practice",
+    "status": "complete",
+    "memo": "Build one route + template rendering example"
+  },
+  {
+    "id": 9,
+    "title": "EET 203 Study",
+    "status": "complete",
+    "memo": "Review counters and timers; write 5 ladder logic examples"
+  },
+  {
+    "id": 10,
+    "title": "Clean Desk",
+    "status": "complete",
+    "memo": "Organize parts, label bags, and throw away scraps"
+  }
 ]
