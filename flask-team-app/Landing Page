@@ -1,0 +1,21 @@
+<style>
+  .btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+  }
+  .enter { background-color: #4CAF50; } /* Green */
+  .exit { background-color: #f44336; }  /* Red */
+</style>
+
+<div style="text-align:center; margin-top:50px;">
+  <!-- Link to your specific home page URL -->
+  <a href="index.html" class="btn enter">Enter Home Page</a>
+
+  <!-- Closes the current tab -->
+  <button onclick="window.close()" class="btn exit">Exit</button>
+</div>
