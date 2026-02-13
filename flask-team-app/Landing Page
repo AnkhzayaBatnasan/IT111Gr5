@@ -14,7 +14,7 @@
 
 <div style="text-align:center; margin-top:50px;">
   <!-- Link to your specific home page URL -->
-  <a href="index.html" class="btn enter">Enter Home Page</a>
+  <a href="home.html" class="btn enter">Enter Home Page</a>
 
   <!-- Closes the current tab -->
   <button onclick="window.close()" class="btn exit">Exit</button>
