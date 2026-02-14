@@ -1,0 +1,32 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Landing</title>
+    <style>
+      .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        text-decoration: none;
+        color: white;
+        font-weight: bold;
+        display: inline-block;
+        margin: 0 10px;
+      }
+      .enter { background-color: #4CAF50; } /* Green */
+      .exit { background-color: #f44336; }  /* Red */
+    </style>
+  </head>
+
+  <body>
+    <div style="text-align:center; margin-top:50px;">
+      <!-- Go to Flask route (NOT a static home.html file) -->
+      <a href="{{ url_for('home_page') }}" class="btn enter">Enter Home Page</a>
+
+      <!-- Tries to close tab (may be blocked by browser if not opened by script) -->
+      <button onclick="window.close()" class="btn exit">Exit</button>
+    </div>
+  </body>
+</html>
