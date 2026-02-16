@@ -3,30 +3,54 @@
   <head>
     <meta charset="utf-8" />
     <title>Landing</title>
+
     <style>
+      body {
+        margin: 0;
+        height: 100vh;
+        background-image: url("{{ url_for('static', filename='images/north_seattle_college.jpg') }}");
+
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        font-family: Arial, sans-serif;
+      }
+
+      .overlay {
+        height: 100vh;
+        background-color: rgba(0, 0, 0, 0.55); /* dark overlay */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
       .btn {
-        padding: 10px 20px;
+        padding: 12px 24px;
         border: none;
-        border-radius: 5px;
+        border-radius: 6px;
         cursor: pointer;
         text-decoration: none;
         color: white;
         font-weight: bold;
         display: inline-block;
-        margin: 0 10px;
+        margin: 0 15px;
+        font-size: 16px;
       }
-      .enter { background-color: #4CAF50; } /* Green */
-      .exit { background-color: #f44336; }  /* Red */
+
+      .enter { background-color: #4CAF50; }
+      .exit { background-color: #f44336; }
     </style>
   </head>
 
   <body>
-    <div style="text-align:center; margin-top:50px;">
-      <!-- Go to Flask route (NOT a static home.html file) -->
-      <a href="{{ url_for('home_page') }}" class="btn enter">Enter Home Page</a>
+    <div class="overlay">
+      <div>
+        <!-- Go to Flask route -->
+        <a href="{{ url_for('home_page') }}" class="btn enter">Enter Home Page</a>
 
-      <!-- Tries to close tab (may be blocked by browser if not opened by script) -->
-      <button onclick="window.close()" class="btn exit">Exit</button>
+        <!-- Exit button -->
+        <button onclick="window.close()" class="btn exit">Exit</button>
+      </div>
     </div>
   </body>
 </html>
