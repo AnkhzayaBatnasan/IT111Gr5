@@ -39,6 +39,10 @@ def find_task(tasks, task_id):
 
 
 @app.get("/")
+def landing_page():
+    return render_template("landing.html")
+
+@app.get("/home")
 def home_page():
     tasks = load_tasks()
     total, complete, incomplete = compute_stats(tasks)
@@ -100,4 +104,4 @@ def view_task(task_id):
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="127.0.0.1", port=5000, debug=True)
