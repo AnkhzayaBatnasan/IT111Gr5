@@ -1,0 +1,274 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Landing</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <style>
+      body {
+        margin: 0;
+        height: 100vh;
+        background-image: url("{{ url_for('static', filename='images/north_seattle_college.jpg') }}");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        font-family: Arial, sans-serif;
+      }
+
+      .overlay {
+        height: 100vh;
+        background-color: rgba(0, 0, 0, 0.45); /* slightly lighter overlay */
+        position: relative;
+      }
+
+      /* --- Menu dropdown (TOP-LEFT) --- */
+      .menu-wrap {
+        position: absolute;
+        top: 18px;
+        left: 18px;
+        z-index: 10;
+      }
+
+      .menu-btn {
+        padding: 10px 14px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        background: rgba(0, 0, 0, 0.45);
+        color: #fff;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .menu-btn:hover {
+        background: rgba(0, 0, 0, 0.55);
+      }
+
+      .menu {
+        margin-top: 8px;
+        width: 210px;              /* fixed width so it doesn't stretch */
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        background: rgba(15, 15, 15, 0.88);
+        backdrop-filter: blur(6px);
+        overflow: hidden;
+        display: none;             /* toggled via JS */
+      }
+
+      .menu.open {
+        display: block;
+      }
+
+      .menu a, .menu button {
+        width: 100%;
+        text-align: left;
+        display: block;
+        padding: 12px 12px;
+        font-size: 14px;
+        color: #fff;
+        background: transparent;
+        border: none;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      .menu a:hover, .menu button:hover {
+        background: rgba(255, 255, 255, 0.10);
+      }
+
+      .menu .sep {
+        height: 1px;
+        background: rgba(255, 255, 255, 0.12);
+        margin: 0;
+      }
+
+      /* --- Privacy notice (TOP-LEFT, below menu, more visible) --- */
+      .privacy-warning {
+        position: absolute;
+        top: 68px;                 /* sits under the menu button */
+        left: 18px;
+        width: min(720px, calc(100vw - 36px));
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+
+        padding: 12px 14px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.28);
+        background: rgba(0, 0, 0, 0.62); /* darker so it stands out */
+        color: #fff;
+        backdrop-filter: blur(6px);
+      }
+
+      .privacy-warning__icon {
+        font-size: 20px;
+        line-height: 1;
+        margin-top: 1px;
+      }
+
+      .privacy-warning__content {
+        font-size: 14px;
+        line-height: 1.4;
+        text-align: left; /* left justified */
+      }
+
+      .privacy-warning__link {
+        color: #fff;
+        font-weight: 800;
+        text-decoration: underline;
+        margin-left: 6px;
+        opacity: 0.95;
+      }
+
+      .privacy-warning__link:hover {
+        opacity: 1;
+      }
+
+      /* --- Bottom action buttons --- */
+      .bottom-actions {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 42px; /* push toward bottom */
+        display: flex;
+        justify-content: center;
+        gap: 14px;
+        padding: 0 12px;
+      }
+
+      .btn {
+        padding: 12px 22px;
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        border-radius: 10px;
+        cursor: pointer;
+        text-decoration: none;
+        color: white;
+        font-weight: 800;
+        font-size: 16px;
+
+        /* softer, more "site consistent" */
+        background: rgba(255, 255, 255, 0.14);
+        backdrop-filter: blur(6px);
+      }
+
+      .btn:hover {
+        background: rgba(255, 255, 255, 0.20);
+      }
+
+      /* subtle accent colors without being loud */
+      .enter {
+        border-color: rgba(76, 175, 80, 0.55);
+      }
+
+      .exit {
+        border-color: rgba(244, 67, 54, 0.55);
+      }
+
+      /* Mobile adjustments */
+      @media (max-width: 520px) {
+        .bottom-actions {
+          bottom: 18px;
+          flex-direction: column;
+          align-items: center;
+          gap: 10px;
+        }
+
+        .btn {
+          width: 220px;
+          text-align: center;
+        }
+
+        .privacy-warning {
+          top: 64px;
+          padding: 10px 12px;
+        }
+
+        .privacy-warning__content {
+          font-size: 13px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="overlay">
+      <!-- Menu dropdown (top-left) -->
+      <div class="menu-wrap">
+        <button id="menuBtn" class="menu-btn" aria-haspopup="true" aria-expanded="false">
+          ☰ Menu
+        </button>
+
+        <div id="menu" class="menu" role="menu" aria-label="Landing menu">
+          <a role="menuitem" href="{{ url_for('about_page') }}">About Us</a>
+          <a role="menuitem" href="{{ url_for('privacy_page') }}">Privacy</a>
+          <a role="menuitem" href="{{ url_for('home_page') }}">Home</a>
+
+          <div class="sep"></div>
+
+          <button role="menuitem" type="button" onclick="window.close()">Exit</button>
+        </div>
+      </div>
+
+      <!-- Privacy Warning Notice (more visible, left-justified) -->
+      <section class="privacy-warning" role="note" aria-label="Privacy notice">
+        <div class="privacy-warning__icon" aria-hidden="true">⚠️</div>
+
+        <div class="privacy-warning__content">
+          <strong>Privacy Notice:</strong>
+          Please do not enter personal information such as phone numbers, home addresses,
+          passwords, or financial details anywhere on this site.
+          <a class="privacy-warning__link" href="{{ url_for('privacy_page') }}">Privacy tips</a>
+        </div>
+      </section>
+
+      <!-- Bottom action buttons (softer styling) -->
+      <div class="bottom-actions">
+        <a href="{{ url_for('home_page') }}" class="btn enter">Enter Home Page</a>
+        <button onclick="window.close()" class="btn exit">Exit</button>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        const menuBtn = document.getElementById("menuBtn");
+        const menu = document.getElementById("menu");
+
+        function openMenu() {
+          menu.classList.add("open");
+          menuBtn.setAttribute("aria-expanded", "true");
+        }
+
+        function closeMenu() {
+          menu.classList.remove("open");
+          menuBtn.setAttribute("aria-expanded", "false");
+        }
+
+        function toggleMenu() {
+          if (menu.classList.contains("open")) closeMenu();
+          else openMenu();
+        }
+
+        // Toggle on button click
+        menuBtn.addEventListener("click", function (e) {
+          e.stopPropagation();
+          toggleMenu();
+        });
+
+        // Clicking inside menu should not close it (except on navigation)
+        menu.addEventListener("click", function (e) {
+          e.stopPropagation();
+        });
+
+        // Click outside closes menu
+        document.addEventListener("click", function () {
+          closeMenu();
+        });
+
+        // ESC closes menu
+        document.addEventListener("keydown", function (e) {
+          if (e.key === "Escape") closeMenu();
+        });
+      })();
+    </script>
+  </body>
+</html>

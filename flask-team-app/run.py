@@ -6,6 +6,24 @@ app = Flask(__name__)
 
 DATA_PATH = Path("data/tasks.json")
 
+# ------------------------------------------------------------
+# About page content (Keep the text intact)
+# ------------------------------------------------------------
+
+ABOUT_PARAGRAPHS = [
+    "We are Team 5, a group of students from diverse technical and academic backgrounds collaborating on the Task Tracker productivity web app. Our goal is to design a simple, lightweight tool that helps students and everyday users organize tasks in one place without unnecessary complexity.",
+    "Our team brings together perspectives from psychology, computer science, app development, networking, and electronics. This mix of disciplines helps us think about both the human side of productivity and the technical side of building reliable software. By combining our skills, we aim to create an app that is intuitive, efficient, and focused on real user needs.",
+    "Task Tracker reflects our shared interest in practical problem-solving: helping people stay organized, reduce stress, and manage their work more effectively through a clean, minimal interface.",
+    "Here is a little bit about what our team members are studying for their majors!",
+]
+ABOUT_TEAM_MEMBERS = [
+    {"name": "Ankhzaya", "role": "AAS App Development", "bio": ""},
+    {"name": "Ali", "role": "AAS Network & Server Administration Specialist", "bio": ""},
+    {"name": "John", "role": "AAS Electronics", "bio": ""},
+    {"name": "Drake", "role": "Computer Science", "bio": ""},
+    {"name": "Nil", "role": "Psychology", "bio": ""},
+]
+
 
 def load_tasks():
     if not DATA_PATH.exists():
@@ -39,6 +57,25 @@ def find_task(tasks, task_id):
 
 
 @app.get("/")
+def landing_page():
+    return render_template("landing.html")
+
+
+@app.get("/about")
+def about_page():
+    return render_template(
+        "about.html",
+        about_title="About Us",
+        about_paragraphs=ABOUT_PARAGRAPHS,
+        team_members=ABOUT_TEAM_MEMBERS,
+    )
+
+@app.get("/privacy")
+def privacy_page():
+    return render_template("privacy.html")
+    
+
+@app.get("/home")
 def home_page():
     tasks = load_tasks()
     total, complete, incomplete = compute_stats(tasks)
@@ -60,12 +97,14 @@ def add_task():
         return redirect(url_for("home_page"))
 
     tasks = load_tasks()
-    tasks.append({
-        "id": next_id(tasks),
-        "title": title,
-        "memo": memo,
-        "status": "incomplete"
-    })
+    tasks.append(
+        {
+            "id": next_id(tasks),
+            "title": title,
+            "memo": memo,
+            "status": "incomplete",
+        }
+    )
     save_tasks(tasks)
     return redirect(url_for("home_page"))
 
@@ -77,7 +116,7 @@ def toggle_task(task_id):
     if not task:
         abort(404)
 
-    task["status"] = "complete" if task["status"] != "complete" else "incomplete"
+    task["status"] = "complete" if task.get("status") != "complete" else "incomplete"
     save_tasks(tasks)
     return redirect(url_for("home_page"))
 
@@ -100,4 +139,4 @@ def view_task(task_id):
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="127.0.0.1", port=5000, debug=True)

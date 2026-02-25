@@ -3,6 +3,6 @@ from .config import APP_NAME, APP_VERSION, APP_DESCRIPTION
 
 main_bp = Blueprint("main", __name__)
 
-@main_bp.route("/")
-def home():
+@main_bp.route("/about")
+def about():
     return f"{APP_NAME} v{APP_VERSION} - {APP_DESCRIPTION}"
