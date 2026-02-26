@@ -1,0 +1,26 @@
+<!-- Shared top navigation -->
+<div class="nav topnav">
+  <a class="brand" href="{{ url_for('landing_page') }}">
+    <img class="logo" src="{{ url_for('static', filename='nsc-logo.svg') }}" alt="Logo" />
+    <div class="brandText">
+      <div class="brandTitle">Task Tracker</div>
+      <div class="brandSub">Private task lists • Simple workflow</div>
+    </div>
+  </a>
+
+  <input id="navcheck" class="navcheck" type="checkbox" aria-label="Toggle menu" />
+  <label class="navtoggle pill" for="navcheck">Menu</label>
+
+  <div class="navlinks">
+    <a class="pill ghost" href="{{ url_for('about_page') }}">About</a>
+    <a class="pill ghost" href="{{ url_for('privacy_page') }}">Privacy</a>
+
+    {% if session.get('user_id') %}
+      <a class="pill" href="{{ url_for('home_page') }}">Dashboard</a>
+      <a class="pill danger" href="{{ url_for('logout') }}">Logout</a>
+    {% else %}
+      <a class="pill" href="{{ url_for('login') }}">Login</a>
+      <a class="pill" href="{{ url_for('register') }}">Create Account</a>
+    {% endif %}
+  </div>
+</div>

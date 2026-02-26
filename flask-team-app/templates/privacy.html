@@ -2,142 +2,45 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Privacy Tips</title>
-
-    <style>
-      :root {
-        --bg: #0b1220;
-        --card: rgba(255, 255, 255, 0.08);
-        --text: #f3f4f6;
-        --muted: rgba(243, 244, 246, 0.75);
-        --border: rgba(255, 255, 255, 0.14);
-      }
-
-      * { box-sizing: border-box; }
-
-      body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        color: var(--text);
-        background: linear-gradient(180deg, #0b1220 0%, #0f1b33 100%);
-        min-height: 100vh;
-      }
-
-      .wrap {
-        max-width: 980px;
-        margin: 0 auto;
-        padding: 18px;
-      }
-
-      .topbar {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 14px;
-      }
-
-      .title {
-        font-size: 32px;
-        font-weight: 900;
-        margin: 0;
-      }
-
-      .btn {
-        display: inline-block;
-        border: 1px solid var(--border);
-        background: rgba(255, 255, 255, 0.06);
-        color: var(--text);
-        padding: 10px 14px;
-        border-radius: 10px;
-        text-decoration: none;
-        font-weight: 800;
-        cursor: pointer;
-      }
-
-      .btn:hover {
-        background: rgba(255, 255, 255, 0.10);
-      }
-
-      .card {
-        background: var(--card);
-        border: 1px solid var(--border);
-        border-radius: 14px;
-        padding: 16px;
-        backdrop-filter: blur(6px);
-      }
-
-      .notice {
-        display: flex;
-        gap: 12px;
-        align-items: flex-start;
-        padding: 12px 14px;
-        border-radius: 12px;
-        border: 1px solid rgba(255, 255, 255, 0.20);
-        background: rgba(0, 0, 0, 0.35);
-        margin-bottom: 14px;
-      }
-
-      .icon {
-        font-size: 22px;
-        line-height: 1;
-        margin-top: 1px;
-      }
-
-      h2 {
-        margin: 0 0 8px 0;
-        font-size: 18px;
-        font-weight: 900;
-      }
-
-      ul {
-        margin: 0;
-        padding-left: 18px;
-        line-height: 1.6;
-      }
-
-      .muted {
-        color: var(--muted);
-        font-size: 13px;
-        margin-top: 10px;
-      }
-    </style>
+    <title>Privacy • Task Tracker</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
   </head>
 
   <body>
-    <div class="wrap">
-      <div class="topbar">
-        <h1 class="title">Privacy Tips</h1>
-        <div>
-          <a class="btn" href="{{ url_for('landing_page') }}">← Back to Landing</a>
-          <a class="btn" href="{{ url_for('home_page') }}">Go to Home</a>
-        </div>
-      </div>
+    <div class="container">
+      {% include "_nav.html" %}
 
       <div class="card">
-        <div class="notice" role="note" aria-label="Privacy notice">
-          <div class="icon" aria-hidden="true">⚠️</div>
-          <div>
-            <strong>Privacy Notice:</strong>
-            Please do not enter personal information such as phone numbers, home addresses,
-            passwords, or financial details anywhere on this site.
-            <div class="muted">
-              This app is for class learning and demo purposes. Keep your data non-sensitive.
-            </div>
-          </div>
+        <div class="cardHeader">
+          <div style="font-weight:800;">Privacy</div>
+          <span class="pill ghost">Tips</span>
         </div>
 
-        <section id="privacy-tips" class="privacy-tips">
-          <h2>Privacy Tips</h2>
-          <ul>
-            <li>Don’t share passwords, PINs, or account logins.</li>
-            <li>Avoid phone numbers, home addresses, and full names.</li>
-            <li>Do not enter financial info (cards, bank info, SSN).</li>
-            <li>If you accidentally submit something sensitive, remove it immediately.</li>
+        <div class="cardBody contentPage">
+          <p class="contentPara">
+            This project stores accounts and tasks locally as JSON files for learning purposes.
+            It is not meant for real sensitive information.
+          </p>
+
+          <div class="contentSectionTitle">What we store</div>
+          <ul class="contentList">
+            <li>Username + email</li>
+            <li>Hashed password (not plain text)</li>
+            <li>Your tasks and due dates (private per account)</li>
           </ul>
-        </section>
+
+          <div class="contentSectionTitle">Good habits</div>
+          <ul class="contentList">
+            <li>Use a strong password you don’t reuse elsewhere</li>
+            <li>Don’t put private personal info in task notes</li>
+            <li>Log out on shared computers</li>
+          </ul>
+
+          <p class="contentPara muted">
+            For a production app, you would use a database and HTTPS, plus stronger security controls.
+          </p>
+        </div>
       </div>
     </div>
   </body>

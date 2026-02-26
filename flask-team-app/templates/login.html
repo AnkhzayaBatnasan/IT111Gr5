@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Login • Task Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  </head>
+
+  <body class="authBody">
+    <div class="container">
+      {% include "_nav.html" %}
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="flash-wrap">
+            {% for category, message in messages %}
+              <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <div class="authWrap">
+        <div class="card authCard">
+          <div class="cardHeader">
+            <div style="font-weight:800;">Login</div>
+            <span class="pill ghost">Welcome back</span>
+          </div>
+
+          <div class="cardBody">
+            <form method="POST" action="{{ url_for('login_post') }}" class="authForm">
+              <input type="hidden" name="next" value="{{ next or '' }}"/>
+
+              <label class="fieldLabel" for="username_or_email">Username or Email</label>
+              <input id="username_or_email" name="username_or_email" required
+                     placeholder="e.g. ali or ali@example.com" class="textInput"/>
+
+              <label class="fieldLabel" for="password">Password</label>
+              <input id="password" name="password" type="password" required
+                     placeholder="Your password" class="textInput"/>
+
+              <button class="pill" type="submit" style="border:none;">Log in</button>
+
+              <div class="authHint">
+                No account? <a class="link" href="{{ url_for('register') }}">Create one</a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
