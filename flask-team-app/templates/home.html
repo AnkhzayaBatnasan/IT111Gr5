@@ -9,32 +9,26 @@
 
   <body>
     <div class="container">
-      <!-- Top Nav -->
-      <div class="nav">
-        <div class="brand">
-          <img
-            class="logo"
-            src="{{ url_for('static', filename='nsc-logo.svg') }}"
-            alt="App Logo"
-          />
-          <div>
-            Task Tracker<br />
-            <span style="color:var(--muted); font-weight:500; font-size:12px;">
-              Simple productivity web app
-            </span>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="flash-wrap">
+            {% for category, message in messages %}
+              <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}
           </div>
-        </div>
+        {% endif %}
+      {% endwith %}
 
-        <div class="pill">IT111 Group Project</div>
-      </div>
+      {% include '_nav.html' %}
 
-      <!-- Compact header -->
+<!-- Compact header -->
       <div class="card">
         <div class="cardBody" style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
           <div>
             <div style="font-weight:800; font-size:18px;">Dashboard</div>
             <div style="color:var(--muted); font-size:13px;">
-              Desktop: fixed app layout. Mobile: page scrolls naturally.
+              Track your tasks, set due dates, and stay on top of what’s next.
             </div>
           </div>
 
@@ -51,17 +45,32 @@
         <!-- Tasks panel -->
         <div class="card">
           <div class="cardHeader">
-            <div style="font-weight:700;">Your Tasks</div>
-            <div class="pill">Home</div>
+            <div style="font-weight:800;">Your Tasks</div>
+            <div class="headerRight">
+              <form method="GET" action="{{ url_for('home_page') }}" class="sortForm">
+                <label class="sortLabel" for="sort">Sort</label>
+                <select id="sort" name="sort" class="sortSelect" onchange="this.form.submit()">
+                  <option value="due_asc" {% if sort=='due_asc' %}selected{% endif %}>Due date (soonest)</option>
+                  <option value="due_desc" {% if sort=='due_desc' %}selected{% endif %}>Due date (latest)</option>
+                  <option value="newest" {% if sort=='newest' %}selected{% endif %}>Created (newest)</option>
+                  <option value="oldest" {% if sort=='oldest' %}selected{% endif %}>Created (oldest)</option>
+                  <option value="status" {% if sort=='status' %}selected{% endif %}>Status (incomplete first)</option>
+                </select>
+              </form>
+              <div class="pill">Dashboard</div>
+            </div>
           </div>
 
           <!-- ✅ Scroll happens here (inside the tasks panel) -->
           <div class="cardBody scrollArea">
             <form method="POST" action="/tasks/add" style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:12px;">
+              <input type="hidden" name="sort" value="{{ sort }}"/>
               <input name="title" placeholder="Task title..." required
                      style="flex:1; min-width:220px; padding:10px; border-radius:12px; border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.04); color:var(--text);" />
               <input name="memo" placeholder="Optional memo..."
                      style="flex:2; min-width:260px; padding:10px; border-radius:12px; border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.04); color:var(--text);" />
+              <input name="due_date" type="date" aria-label="Due date"
+                     style="min-width:170px; padding:10px; border-radius:12px; border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.04); color:var(--text);" />
               <button class="pill" type="submit" style="border:none;">Add</button>
             </form>
 
@@ -70,6 +79,13 @@
                 <div class="task">
                   <div>
                     <p class="taskTitle">{{ task.title }}</p>
+                    <div class="taskMeta">
+                      {% if task.due_date %}
+                        <span class="metaPill">Due: {{ task.due_date }}</span>
+                      {% else %}
+                        <span class="metaPill muted">No due date</span>
+                      {% endif %}
+                    </div>
                     {% if task.memo %}
                       <p class="taskMemo">{{ task.memo }}</p>
                     {% else %}
@@ -88,10 +104,12 @@
                       <a class="pill" href="/tasks/{{ task.id }}" style="text-decoration:none;">View</a>
 
                       <form method="POST" action="/tasks/{{ task.id }}/toggle" style="margin:0;">
+                        <input type="hidden" name="sort" value="{{ sort }}"/>
                         <button class="pill" type="submit" style="border:none;">Toggle</button>
                       </form>
 
                       <form method="POST" action="/tasks/{{ task.id }}/delete" style="margin:0;" onsubmit="return confirm('Delete this task?');">
+                        <input type="hidden" name="sort" value="{{ sort }}"/>
                         <button class="pill" type="submit" style="border:none;">Delete</button>
                       </form>
                     </div>
@@ -110,24 +128,53 @@
         <!-- Right panel -->
         <div class="card">
           <div class="cardHeader">
-            <div style="font-weight:700;">Quick Info</div>
-            <div class="pill">MVP</div>
+            <div style="font-weight:800;">Today</div>
+            <div class="pill">Your guide</div>
           </div>
 
           <div class="cardBody">
-            <p style="margin:0 0 10px 0; color:var(--muted); line-height:1.5;">
-              This app loads tasks from <code>data/tasks.json</code>. Next steps: add tasks, toggle complete, delete.
-            </p>
+            <div class="miniSection">
+              <div class="miniTitle">Next up</div>
+              {% set ns = namespace(count=0) %}
+              {% for t in tasks %}
+                {% if (not t.completed) and t.due_date %}
+                  {% if ns.count < 3 %}
+                    <div class="miniRow">
+                      <div class="miniLeft">
+                        <div class="miniName">{{ t.title }}</div>
+                        <div class="miniMeta">Due {{ t.due_date }}</div>
+                      </div>
+                      <a class="miniLink" href="{{ url_for('view_task', task_id=t.id) }}">View</a>
+                    </div>
+                    {% set ns.count = ns.count + 1 %}
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+              {% if ns.count == 0 %}
+                <div class="empty" style="margin-top:8px;">
+                  <b>No upcoming due dates.</b><br/>
+                  Add a task and pick a due date to see it here.
+                </div>
+              {% endif %}
+            </div>
 
-            <div class="pill">✅ View tasks (US1)</div>
-            <div style="height:10px"></div>
-            <div class="pill">🧩 Add task (US2)</div>
-            <div style="height:10px"></div>
-            <div class="pill">🔁 Toggle (US3)</div>
-            <div style="height:10px"></div>
-            <div class="pill">🗑 Delete (US4)</div>
+            <div style="height:14px"></div>
+
+            <div class="miniSection">
+              <div class="miniTitle">Quick tips</div>
+              <div class="tip">
+                <b>Add tasks fast:</b> type a title, optionally add a memo, pick a due date, then hit <b>Add</b>.
+              </div>
+              <div class="tip">
+                <b>Stay focused:</b> use <b>Sort</b> to show what’s due soon or bring incomplete tasks to the top.
+              </div>
+              <div class="tip">
+                <b>Private by default:</b> your tasks are tied to your account — other users can’t see them.
+              </div>
+            </div>
           </div>
         </div>
+</div>
       </div>
     </div>
   </body>

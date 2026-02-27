@@ -2,210 +2,38 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>About</title>
-
-    <style>
-      :root {
-        --bg: #0b1220;
-        --card: rgba(255, 255, 255, 0.08);
-        --text: #f3f4f6;
-        --muted: rgba(243, 244, 246, 0.75);
-        --border: rgba(255, 255, 255, 0.14);
-        --accent: #60a5fa;
-      }
-
-      * { box-sizing: border-box; }
-
-      body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        color: var(--text);
-        background: linear-gradient(180deg, #0b1220 0%, #0f1b33 100%);
-        min-height: 100vh;
-      }
-
-      .wrap {
-	max-width: 1100px;
-	margin: 0 auto;
-  	padding: 18px;
-      }
-      .topbar {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 14px;
-      }
-
-      .title {
-	font-size: 34px;
-	font-weight: 900;
-	letter-spacing: 0.2px;
-	margin: 0;
-      }
-
-      .actions {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-      }
-
-      .btn {
-        display: inline-block;
-        border: 1px solid var(--border);
-        background: rgba(255, 255, 255, 0.06);
-        color: var(--text);
-        padding: 10px 14px;
-        border-radius: 10px;
-        text-decoration: none;
-        font-weight: 700;
-        cursor: pointer;
-      }
-
-      .btn:hover {
-        border-color: rgba(255, 255, 255, 0.25);
-        background: rgba(255, 255, 255, 0.10);
-      }
-
-      .card {
-        background: var(--card);
-        border: 1px solid var(--border);
-        border-radius: 14px;
-        padding: 16px;
-        backdrop-filter: blur(6px);
-      }
-
-      .grid {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 14px;
-      }
-
-      @media (min-width: 800px) {
-        .grid {
-          grid-template-columns: 1.25fr 0.75fr;
-        }
-      }
-
-      .section-title {
-        margin: 0 0 10px 0;
-        font-size: 18px;
-        font-weight: 800;
-      }
-
-      .muted {
-        color: var(--muted);
-        font-size: 13px;
-        margin-top: 10px;
-      }
-
-      .member-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        display: grid;
-        gap: 10px;
-      }
-
-      .member {
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 12px;
-        background: rgba(255, 255, 255, 0.05);
-      }
-
-      .member-name {
-        font-weight: 900;
-        margin: 0 0 4px 0;
-        font-size: 16px;
-      }
-
-      .member-role {
-        margin: 0;
-        color: var(--muted);
-        font-weight: 700;
-        font-size: 14px;
-      }
-
-      .member-bio {
-        margin: 8px 0 0 0;
-        color: var(--text);
-        line-height: 1.45;
-      }
-
-      .pill {
-        display: inline-block;
-        border: 1px solid rgba(96, 165, 250, 0.55);
-        color: var(--text);
-        background: rgba(96, 165, 250, 0.12);
-        padding: 5px 10px;
-        border-radius: 999px;
-        font-size: 12px;
-        font-weight: 800;
-        margin-top: 10px;
-      }
-
-      .about-text {
-	margin-top: 6px;
-      }
-
-      .about-paragraph {
-  	margin: 0 0 12px 0;   /* spacing between paragraphs */
-  	line-height: 1.6;
-  	font-size: 16px;
-  	color: var(--text);
-      }
-
-      .about-paragraph:last-child {
-	margin-bottom: 0;
-      }
-    </style>
+    <title>{{ about_title or "About" }} • Task Tracker</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
   </head>
 
   <body>
-    <div class="wrap">
-      <div class="topbar">
-        <h1 class="title">About</h1>
-        <div class="actions">
-          <a class="btn" href="{{ url_for('landing_page') }}">← Back to Landing</a>
-          <a class="btn" href="{{ url_for('home_page') }}">Go to Home</a>
+    <div class="container">
+      {% include "_nav.html" %}
+
+      <div class="card">
+        <div class="cardHeader">
+          <div style="font-weight:800;">{{ about_title or "About Us" }}</div>
+          <span class="pill ghost">Info</span>
         </div>
-      </div>
 
-      <div class="grid">
-        <section class="card" aria-label="Project description">
-          <h2 class="section-title">{{ about_title }}</h2>
+        <div class="cardBody contentPage">
+          {% for p in about_paragraphs %}
+            <p class="contentPara">{{ p }}</p>
+          {% endfor %}
 
-	  <div class="about-text">
-  	    {% for para in about_paragraphs %}
-              <p class="about-paragraph">{{ para }}</p>
-  	    {% endfor %}
-	  </div>
-          <div class="pill">Team 5 • Task Tracker</div>
-          <div class="muted">
-            Tip: This layout is responsive—on mobile the sections stack; on desktop they appear side-by-side.
-          </div>
-        </section>
-
-        <section class="card" aria-label="Team members">
-          <h2 class="section-title">Team Members</h2>
-
-          <ul class="member-list">
-            {% for m in team_members %}
-              <li class="member">
-                <p class="member-name">{{ m.name }}</p>
-                {% if m.role %}
-                  <p class="member-role">{{ m.role }}</p>
-                {% endif %}
-                {% if m.bio %}
-                  <p class="member-bio">{{ m.bio }}</p>
-                {% endif %}
-              </li>
-            {% endfor %}
-          </ul>
-        </section>
+          {% if team_members %}
+            <div class="contentSectionTitle">Team Members</div>
+            <div class="teamGrid">
+              {% for m in team_members %}
+                <div class="teamCard">
+                  <div class="teamName">{{ m.name }}</div>
+                  {% if m.role %}<div class="teamRole">{{ m.role }}</div>{% endif %}
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
       </div>
     </div>
   </body>

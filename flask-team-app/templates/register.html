@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Create Account • Task Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  </head>
+
+  <body class="authBody">
+    <div class="container">
+      {% include "_nav.html" %}
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="flash-wrap">
+            {% for category, message in messages %}
+              <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <div class="authWrap">
+        <div class="card authCard">
+          <div class="cardHeader">
+            <div style="font-weight:800;">Create Account</div>
+            <span class="pill ghost">Private tasks</span>
+          </div>
+
+          <div class="cardBody">
+            <form method="POST" action="{{ url_for('register_post') }}" class="authForm">
+              <label class="fieldLabel" for="username">Username</label>
+              <input id="username" name="username" required placeholder="Pick a username" class="textInput"/>
+
+              <label class="fieldLabel" for="email">Email</label>
+              <input id="email" name="email" type="email" required
+                     placeholder="name@example.com"
+                     pattern="^[^@\s]+@[^@\s]+\.[^@\s]+$"
+                     title="Use a valid email format like name@example.com"
+                     class="textInput"/>
+
+              <label class="fieldLabel" for="password">Password</label>
+              <input id="password" name="password" type="password" required
+                     minlength="6"
+                     placeholder="At least 6 characters" class="textInput"/>
+
+              <button class="pill" type="submit" style="border:none;">Create account</button>
+
+              <div class="authHint">
+                Already have an account? <a class="link" href="{{ url_for('login') }}">Log in</a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
