@@ -124,7 +124,6 @@ def login_required(view_func):
     return wrapper
 
 
-
 def is_valid_email(email: str) -> bool:
     # Simple, practical email format check for a class project (not fully RFC compliant)
     # Requires: local@domain.tld (at least one dot in the domain part)
@@ -178,7 +177,11 @@ def sort_tasks(tasks, sort_key: str):
 
     if sort_key == "status":
         # Incomplete first, then complete
-        return sorted(tasks, key=lambda t: (t.get("status") == "complete", (t.get("created_at") or "")), reverse=False)
+        return sorted(
+            tasks,
+            key=lambda t: (t.get("status") == "complete", (t.get("created_at") or "")),
+            reverse=False,
+        )
 
     if sort_key == "newest":
         return sorted(tasks, key=lambda t: (t.get("created_at") or ""), reverse=True)
@@ -190,9 +193,26 @@ def sort_tasks(tasks, sort_key: str):
     return tasks
 
 
-
 def find_task(tasks, task_id):
     return next((t for t in tasks if t.get("id") == task_id), None)
+
+
+def current_home_query_defaults():
+    """
+    Build a querystring dict for /home so POST routes can preserve the user's filters.
+    We prefer form fields (hidden inputs) first, then fallback to request.args.
+    """
+    def pick(name, default=""):
+        return (request.form.get(name) or request.args.get(name) or default).strip()
+
+    return {
+        "sort": pick("sort", "due_asc"),
+        "status": pick("status", "all"),
+        "q": pick("q", ""),
+        "due": pick("due", ""),
+        "due_from": pick("due_from", ""),
+        "due_to": pick("due_to", ""),
+    }
 
 
 @app.get("/")
@@ -209,10 +229,11 @@ def about_page():
         team_members=ABOUT_TEAM_MEMBERS,
     )
 
+
 @app.get("/privacy")
 def privacy_page():
     return render_template("privacy.html")
-    
+
 
 # ------------------------------------------------------------
 # Auth (Register / Login / Logout)
@@ -272,7 +293,6 @@ def register_post():
 
 
 @app.get("/login")
-
 def login():
     if session.get("user_id"):
         return redirect(url_for("home_page"))
@@ -311,30 +331,155 @@ def logout():
     flash("You have been logged out.", "success")
     return redirect(url_for("landing_page"))
 
+
+# ------------------------------------------------------------
+# Home + Filters
+# ------------------------------------------------------------
+
+def apply_filters(tasks, *, status="all", q="", due="", due_from="", due_to=""):
+    """
+    Filters:
+      - status: all | complete | incomplete
+      - q: case-insensitive contains search in title + memo
+      - due: exact due date
+      - due_from / due_to: inclusive range
+    Returns: (filtered_tasks, active_filters_list, error_messages_list)
+    """
+    active = []
+    errors = []
+
+    status = (status or "all").strip().lower()
+    q = (q or "").strip()
+    due = (due or "").strip()
+    due_from = (due_from or "").strip()
+    due_to = (due_to or "").strip()
+
+    filtered = list(tasks)
+
+    # Status
+    if status in ("complete", "incomplete"):
+        filtered = [t for t in filtered if (t.get("status") == "complete") == (status == "complete")]
+        active.append(f"Status: {status.capitalize()}")
+    else:
+        status = "all"
+
+    # Search
+    if q:
+        needle = q.lower()
+        def matches(t):
+            title = (t.get("title") or "").lower()
+            memo = (t.get("memo") or "").lower()
+            return (needle in title) or (needle in memo)
+
+        filtered = [t for t in filtered if matches(t)]
+        active.append(f"Search: “{q}”")
+
+    # Dates
+    due_dt = parse_date_yyyy_mm_dd(due) if due else None
+    from_dt = parse_date_yyyy_mm_dd(due_from) if due_from else None
+    to_dt = parse_date_yyyy_mm_dd(due_to) if due_to else None
+
+    if due and not due_dt:
+        errors.append("Due date filter must be a valid date.")
+    if due_from and not from_dt:
+        errors.append("From date must be a valid date.")
+    if due_to and not to_dt:
+        errors.append("To date must be a valid date.")
+
+    # If exact due is set (and valid), it wins over range (simple, predictable UX)
+    if due_dt:
+        filtered = [t for t in filtered if parse_date_yyyy_mm_dd(t.get("due_date")) == due_dt]
+        active.append(f"Due: {due_dt.isoformat()}")
+        # ignore range if exact is used
+        from_dt = None
+        to_dt = None
+    else:
+        # Range (only apply if at least one bound is valid/present)
+        if from_dt or to_dt:
+            if from_dt and to_dt and from_dt > to_dt:
+                errors.append("Due date range is invalid: From is after To.")
+            else:
+                def in_range(t):
+                    d = parse_date_yyyy_mm_dd(t.get("due_date"))
+                    if d is None:
+                        return False
+                    if from_dt and d < from_dt:
+                        return False
+                    if to_dt and d > to_dt:
+                        return False
+                    return True
+
+                filtered = [t for t in filtered if in_range(t)]
+                if from_dt and to_dt:
+                    active.append(f"Due: {from_dt.isoformat()} → {to_dt.isoformat()}")
+                elif from_dt:
+                    active.append(f"Due: from {from_dt.isoformat()}")
+                else:
+                    active.append(f"Due: up to {to_dt.isoformat()}")
+
+    return filtered, active, errors, status, q, due, due_from, due_to
+
+
 @app.get("/home")
 @login_required
 def home_page():
-    sort = request.args.get("sort", "due_asc")
+    # Querystring params (persist after refresh)
+    sort = (request.args.get("sort", "due_asc") or "due_asc").strip()
+    status = request.args.get("status", "all")
+    q = request.args.get("q", "")
+    due = request.args.get("due", "")
+    due_from = request.args.get("due_from", "")
+    due_to = request.args.get("due_to", "")
+
     tasks = load_tasks(session.get("user_id"))
 
     # Ensure older tasks have expected fields
     for t in tasks:
+        t.setdefault("memo", "")
         t.setdefault("due_date", "")
         t.setdefault("created_at", "")
+        t.setdefault("status", "incomplete")
 
-    tasks_sorted = sort_tasks(list(tasks), sort)
-    total, complete, incomplete = compute_stats(tasks_sorted)
+    # Stats should reflect ALL tasks (not filtered)
+    total_all, complete_all, incomplete_all = compute_stats(tasks)
+
+    # Apply filters, then sort the filtered set
+    filtered, active_filters, errors, status, q, due, due_from, due_to = apply_filters(
+        tasks,
+        status=status,
+        q=q,
+        due=due,
+        due_from=due_from,
+        due_to=due_to,
+    )
+
+    for msg in errors:
+        flash(msg, "error")
+
+    tasks_sorted = sort_tasks(list(filtered), sort)
 
     return render_template(
         "home.html",
         tasks=tasks_sorted,
-        total=total,
-        complete=complete,
-        incomplete=incomplete,
+        total=total_all,
+        complete=complete_all,
+        incomplete=incomplete_all,
+        shown_count=len(tasks_sorted),
         username=session.get("username"),
         sort=sort,
+        # filters (to keep UI sticky)
+        status_filter=status,
+        q=q,
+        due=due,
+        due_from=due_from,
+        due_to=due_to,
+        active_filters=active_filters,
     )
 
+
+# ------------------------------------------------------------
+# Task actions (preserve current filters via hidden inputs)
+# ------------------------------------------------------------
 
 @app.post("/tasks/add")
 @login_required
@@ -365,36 +510,41 @@ def add_task():
         }
     )
     save_tasks(tasks, session.get("user_id"))
-    return redirect(url_for("home_page", sort=request.form.get("sort", "due_asc")))
+
+    qs = current_home_query_defaults()
+    return redirect(url_for("home_page", **qs))
 
 
 @app.post("/tasks/<int:task_id>/toggle")
-
 @login_required
 def toggle_task(task_id):
-    tasks = load_tasks(session.get('user_id'))
+    tasks = load_tasks(session.get("user_id"))
     task = find_task(tasks, task_id)
     if not task:
         abort(404)
 
     task["status"] = "complete" if task.get("status") != "complete" else "incomplete"
-    save_tasks(tasks, session.get('user_id'))
-    return redirect(url_for("home_page", sort=request.form.get("sort", "due_asc")))
+    save_tasks(tasks, session.get("user_id"))
+
+    qs = current_home_query_defaults()
+    return redirect(url_for("home_page", **qs))
 
 
 @app.post("/tasks/<int:task_id>/delete")
 @login_required
 def delete_task(task_id):
-    tasks = load_tasks(session.get('user_id'))
+    tasks = load_tasks(session.get("user_id"))
     tasks = [t for t in tasks if t.get("id") != task_id]
-    save_tasks(tasks, session.get('user_id'))
-    return redirect(url_for("home_page", sort=request.form.get("sort", "due_asc")))
+    save_tasks(tasks, session.get("user_id"))
+
+    qs = current_home_query_defaults()
+    return redirect(url_for("home_page", **qs))
 
 
 @app.get("/tasks/<int:task_id>")
 @login_required
 def view_task(task_id):
-    tasks = load_tasks(session.get('user_id'))
+    tasks = load_tasks(session.get("user_id"))
     task = find_task(tasks, task_id)
     if not task:
         abort(404)

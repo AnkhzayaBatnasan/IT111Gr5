@@ -1,4 +1,3 @@
-
 /* ===== Base variables ===== */
 :root{
   --bg:#0b1220;
@@ -9,6 +8,11 @@
   --border:rgba(255,255,255,.10);
   --shadow: 0 16px 40px rgba(0,0,0,.35);
   --radius:16px;
+
+  /* ===== Pill / control surfaces (darker, less "white") ===== */
+  --pillBg: rgba(0,0,0,.18);
+  --pillBgHover: rgba(0,0,0,.28);
+  --pillBgSoft: rgba(0,0,0,.12);
 }
 
 /* ===== Reset ===== */
@@ -78,8 +82,11 @@ a{ color:inherit; text-decoration:none; }
   font-size:13px;
   border-radius:999px;
   border:1px solid var(--border);
-  background: rgba(255,255,255,.05);
+  background: var(--pillBg);
   color:var(--muted);
+}
+.pill:hover{
+  background: var(--pillBgHover);
 }
 
 .stats{
@@ -295,7 +302,7 @@ a{ color:inherit; text-decoration:none; }
   padding: 8px 10px;
   border: 1px solid var(--border);
   border-radius: 999px;
-  background: rgba(255,255,255,.06);
+  background: var(--pillBg);
 }
 .userName{
   color: var(--text);
@@ -310,10 +317,10 @@ a{ color:inherit; text-decoration:none; }
   padding: 6px 10px;
   border-radius: 999px;
   border: 1px solid rgba(255,255,255,.12);
-  background: rgba(255,255,255,.05);
+  background: var(--pillBg);
 }
 .logoutLink:hover{
-  background: rgba(255,255,255,.09);
+  background: var(--pillBgHover);
 }
 
 /* ===== Auth pages ===== */
@@ -428,13 +435,35 @@ a{ color:inherit; text-decoration:none; }
 .landingBody{
   overflow:auto;
 }
-
+/* ===== Landing background: lighten photo without losing text ===== */
 .landingShell{
-  min-height:100vh;
-  display:flex;
-  flex-direction:column;
+  position: relative;
+  isolation: isolate;              /* keeps overlay behind content */
+  min-height: 100dvh;
+  background-image: url("../static/north_seattle_college.jpg"); /* or whatever you're using */
+  background-size: cover;
+  background-position: center;
 }
 
+/* overlay that controls darkness */
+.landingShell::before{
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+
+  /* ↓ LOWER alpha = lighter image */
+  background: linear-gradient(
+    180deg,
+    rgba(8,12,24,0.22),    /* was darker; keep this around 0.18–0.28 */
+    rgba(8,12,24,0.46)
+  );
+}
+
+/* optional: tiny boost to image brightness */
+.landingShell{
+  filter: brightness(1.08) contrast(1.03);
+}
 .landingHeader{
   padding:16px 16px 0;
 }
@@ -488,11 +517,14 @@ a{ color:inherit; text-decoration:none; }
 .navToggle{
   display:none;
   border:1px solid var(--border);
-  background: rgba(255,255,255,.06);
+  background: var(--pillBg);
   color:var(--text);
   border-radius:12px;
   padding:10px 12px;
   cursor:pointer;
+}
+.navToggle:hover{
+  background: var(--pillBgHover);
 }
 
 .landingLinks{
@@ -509,7 +541,7 @@ a{ color:inherit; text-decoration:none; }
 }
 
 .landingLinks a:hover{
-  background: rgba(255,255,255,.06);
+  background: var(--pillBg);
 }
 
 .btnSm{
@@ -540,7 +572,10 @@ a{ color:inherit; text-decoration:none; }
 }
 
 .ghost{
-  background: rgba(255,255,255,.06);
+  background: var(--pillBg);
+}
+.ghost:hover{
+  background: var(--pillBgHover);
 }
 
 .landingMain{
@@ -685,7 +720,10 @@ a{ color:inherit; text-decoration:none; }
 }
 
 .pill.ghost{
-  background: rgba(255,255,255,.03);
+  background: var(--pillBgSoft);
+}
+.pill.ghost:hover{
+  background: var(--pillBg);
 }
 
 .pill.danger{
@@ -725,7 +763,7 @@ a{ color:inherit; text-decoration:none; }
   padding:6px 10px;
   border-radius:999px;
   border:1px solid var(--border);
-  background: rgba(255,255,255,.05);
+  background: var(--pillBg);
   color: var(--muted);
   font-size:12px;
   margin-bottom:10px;
@@ -777,7 +815,7 @@ a{ color:inherit; text-decoration:none; }
   padding:6px 10px;
   border-radius:999px;
   border:1px solid var(--border);
-  background: rgba(255,255,255,.03);
+  background: var(--pillBgSoft);
 }
 .sortLabel{ font-size:12px; color: var(--muted); }
 .sortSelect{
@@ -797,7 +835,7 @@ a{ color:inherit; text-decoration:none; }
   padding:4px 10px;
   border-radius:999px;
   border:1px solid var(--border);
-  background: rgba(255,255,255,.03);
+  background: var(--pillBgSoft);
   font-size:12px;
   color: var(--text);
 }
@@ -835,7 +873,7 @@ a{ color:inherit; text-decoration:none; }
 }
 .teamCard{
   border:1px solid var(--border);
-  background: rgba(255,255,255,.03);
+  background: var(--pillBgSoft);
   border-radius: 14px;
   padding:12px;
 }
@@ -856,14 +894,51 @@ a{ color:inherit; text-decoration:none; }
 
 
 /* ===== Dashboard info card ===== */
-.miniSection{ border:1px solid var(--border); border-radius:14px; padding:12px; background: rgba(255,255,255,.03); }
-.miniTitle{ font-weight:800; margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; }
-.miniRow{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px; border-radius:12px; background: rgba(0,0,0,.18); border:1px solid rgba(255,255,255,.06); }
+.miniSection{
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:12px;
+  background: var(--pillBgSoft);
+}
+.miniTitle{
+  font-weight:800;
+  margin-bottom:10px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.miniRow{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:10px;
+  border-radius:12px;
+  background: rgba(0,0,0,.18);
+  border:1px solid rgba(255,255,255,.06);
+}
 .miniRow + .miniRow{ margin-top:10px; }
 .miniName{ font-weight:800; font-size:14px; }
 .miniMeta{ color: var(--muted); font-size:12px; margin-top:2px; }
-.miniLink{ font-size:13px; font-weight:700; color: var(--text); text-decoration:none; padding:8px 10px; border-radius:12px; border:1px solid var(--border); background: rgba(255,255,255,.03); }
-.miniLink:hover{ background: rgba(255,255,255,.06); }
+.miniLink{
+  font-size:13px;
+  font-weight:700;
+  color: var(--text);
+  text-decoration:none;
+  padding:8px 10px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background: var(--pillBgSoft);
+}
+.miniLink:hover{ background: var(--pillBg); }
 
-.tip{ color: var(--muted); line-height:1.55; font-size:13px; padding:10px; border-radius:12px; border:1px solid rgba(255,255,255,.06); background: rgba(0,0,0,.14); }
+.tip{
+  color: var(--muted);
+  line-height:1.55;
+  font-size:13px;
+  padding:10px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.06);
+  background: rgba(0,0,0,.14);
+}
 .tip + .tip{ margin-top:10px; }
