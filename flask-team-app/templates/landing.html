@@ -9,7 +9,8 @@
 
   <body class="landingBody">
     <div class="landingShell" style="background-image:
-          linear-gradient(180deg, rgba(11,18,32,.40) 0%, rgba(11,18,32,.92) 70%),
+          /* Lighter overlay (was .40 and .92) */
+          linear-gradient(180deg, rgba(11,18,32,.18) 0%, rgba(11,18,32,.52) 70%),
           url('{{ url_for('static', filename='images/north_seattle_college.jpg') }}');">
       <div class="container landingContainer">
         {% include "_nav.html" %}

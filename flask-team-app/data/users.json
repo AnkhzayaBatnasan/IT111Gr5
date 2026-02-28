@@ -1,0 +1,8 @@
+[
+  {
+    "id": 1,
+    "username": "john.e.nelson",
+    "email": "john.e.nelson@seattlecolleges.edu",
+    "password_hash": "pbkdf2:sha256:1000000$GVlNohVNv7XKTKLb$1e88f423a6775989b2fe76d7203e3f61a40e700e7258a5818cbe3c36770b7b08"
+  }
+]
