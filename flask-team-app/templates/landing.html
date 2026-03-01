@@ -1,61 +1,152 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>Task Tracker • Welcome</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-  </head>
+<head>
+<meta charset="utf-8" />
+<title>Task Tracker • Welcome</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
 
-  <body class="landingBody">
-    <div class="landingShell" style="background-image:
-          /* Lighter overlay (was .40 and .92) */
-          linear-gradient(180deg, rgba(11,18,32,.18) 0%, rgba(11,18,32,.52) 70%),
-          url('{{ url_for('static', filename='images/north_seattle_college.jpg') }}');">
-      <div class="container landingContainer">
-        {% include "_nav.html" %}
+<body class="landingBody">
 
-        <section class="hero">
-          <div class="heroText">
-            <div class="heroKicker">IT111 Group Project</div>
-            <h1>Track tasks. Stay on time. Keep it private.</h1>
-            <p>
-              Create an account and manage your own task list — with due dates, status,
-              and a clean dashboard that works on mobile, tablet, and desktop.
-            </p>
+<div class="landingShell">
+<div class="container landingContainer">
 
-            <div class="heroActions">
-              {% if session.get('user_id') %}
-                <a class="pill" href="{{ url_for('home_page') }}">Go to Dashboard</a>
-                <a class="pill ghost" href="{{ url_for('logout') }}">Logout</a>
-              {% else %}
-                <a class="pill" href="{{ url_for('login') }}">Login</a>
-                <a class="pill ghost" href="{{ url_for('register') }}">Create Account</a>
-              {% endif %}
+{% include "_nav.html" %}
+
+<!-- ================= HERO ================= -->
+
+<section class="hero">
+
+<div class="heroText">
+
+<div class="heroKicker">IT111 Group Project</div>
+
+<h1>Track tasks. Stay on time. Keep it private.</h1>
+
+<p>
+Create an account and manage your own task list —
+with due dates, status, and a clean dashboard that works on all devices.
+</p>
+
+<div class="heroActions">
+{% if session.get('user_id') %}
+<a class="pill" href="{{ url_for('home_page') }}">Go to Dashboard</a>
+<a class="pill ghost" href="{{ url_for('logout') }}">Logout</a>
+{% else %}
+<a class="pill" href="{{ url_for('login') }}">Login</a>
+<a class="pill ghost" href="{{ url_for('register') }}">Create Account</a>
+{% endif %}
+</div>
+
+</div>
+
+<div class="heroCard">
+<div class="miniCard">
+
+<div class="miniTitle">What you can do</div>
+
+<ul class="miniList">
+<li>✅ Add tasks with due dates</li>
+<li>🔒 Keep lists private per account</li>
+<li>📌 Sort by due date or status</li>
+<li>📱 Responsive UI</li>
+</ul>
+
+</div>
+</div>
+
+</section>
+
+<!-- ================= COMMENTS ================= -->
+
+<section class="commentSection">
+
+<h2>Share Your Feedback</h2>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<div class="flash-wrap">
+{% for category, message in messages %}
+<div class="flash {{ category }}">{{ message }}</div>
+{% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+
+<form method="POST" action="{{ url_for('submit_comment') }}" class="commentForm">
+
+<input type="text"
+name="name"
+placeholder="Your name (optional)"
+maxlength="50">
+
+<textarea
+name="comment"
+placeholder="Write your feedback..."
+maxlength="500"
+required></textarea>
+
+<button type="submit" class="pill">Submit</button>
+
+</form>
+
+<div class="commentList">
+
+{% if comments %}
+
+    {% for c in comments %}
+
+        <div class="commentCard">
+
+            <div class="commentHeader">
+
+                <span class="commentName">{{ c.name }}</span>
+                <span class="commentDate">{{ c.created_at }}</span>
+{% if session.get("user_id") and
+      (c.get("user_id") == session.get("user_id")
+       or session.get("username") == "admin") %}
+
+<form method="POST"
+      action="{{ url_for('delete_comment', comment_id=c['id']) }}"
+      style="display:inline;">
+
+<button type="submit" class="pill danger">
+Delete
+</button>
+
+</form>
+
+{% endif %}
+
+
             </div>
-          </div>
 
-          <div class="heroCard">
-            <div class="miniCard">
-              <div class="miniTitle">What you can do</div>
-              <ul class="miniList">
-                <li>✅ Add tasks with due dates</li>
-                <li>🔒 Keep lists private per account</li>
-                <li>📌 Sort by due date, status, or created time</li>
-                <li>📱 Responsive UI for every screen</li>
-              </ul>
-              <div class="miniFooter">
-                <a class="pill ghost" href="{{ url_for('about_page') }}">About</a>
-                <a class="pill ghost" href="{{ url_for('privacy_page') }}">Privacy</a>
-              </div>
+            <div class="commentText">
+                {{ c.comment }}
             </div>
-          </div>
-        </section>
 
-        <footer class="landingFooter">
-          <span class="muted">© {{ 2026 }} Task Tracker • Built with Flask</span>
-        </footer>
-      </div>
+        </div>
+
+    {% endfor %}
+
+{% else %}
+
+    <div class="commentEmpty">
+        No comments yet. Be the first!
     </div>
-  </body>
+
+{% endif %}
+
+</div>
+</section>
+
+<footer class="landingFooter">
+<span class="mutedSmall">© 2026 Task Tracker • Built with Flask</span>
+</footer>
+
+</div>
+</div>
+
+</body>
 </html>

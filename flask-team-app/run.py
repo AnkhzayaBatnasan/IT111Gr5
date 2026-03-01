@@ -15,6 +15,7 @@ DATA_DIR = Path("data")
 DATA_PATH = DATA_DIR / "tasks.json"  # legacy (kept for backward compatibility)
 USERS_PATH = DATA_DIR / "users.json"
 USER_TASKS_DIR = DATA_DIR / "user_tasks"
+COMMENTS_PATH = DATA_DIR / "comments.json"
 
 # ------------------------------------------------------------
 # About page content (Keep the text intact)
@@ -56,6 +57,40 @@ def save_users(users):
     ensure_data_files()
     with USERS_PATH.open("w", encoding="utf-8") as f:
         json.dump(users, f, indent=2)
+# ------------------------------------------------------------
+# Comments (Feedback)
+# ------------------------------------------------------------
+
+def load_comments():
+
+    ensure_data_files()
+
+    if not COMMENTS_PATH.exists():
+
+        with COMMENTS_PATH.open("w", encoding="utf-8") as f:
+
+            json.dump([], f)
+
+        return []
+
+    try:
+
+        with COMMENTS_PATH.open("r", encoding="utf-8") as f:
+
+            return json.load(f)
+
+    except json.JSONDecodeError:
+
+        return []
+
+
+def save_comments(comments):
+
+    ensure_data_files()
+
+    with COMMENTS_PATH.open("w", encoding="utf-8") as f:
+
+        json.dump(comments, f, indent=2)
 
 
 def find_user(users, *, username=None, email=None, user_id=None):
@@ -217,7 +252,27 @@ def current_home_query_defaults():
 
 @app.get("/")
 def landing_page():
-    return render_template("landing.html")
+
+    comments = load_comments()
+
+    comments = sorted(
+
+        comments,
+
+        key=lambda c:c.get("created_at",""),
+
+        reverse=True
+
+    )
+
+    return render_template(
+
+        "landing.html",
+
+        comments=comments
+
+    )
+
 
 
 @app.get("/about")
@@ -549,6 +604,72 @@ def view_task(task_id):
     if not task:
         abort(404)
     return render_template("task.html", task=task)
+@app.post("/comment")
+
+def submit_comment():
+
+    name = request.form.get("name","").strip()
+
+    text = request.form.get("comment","").strip()
+
+    if not text:
+
+        flash("Comment cannot be empty.","error")
+
+        return redirect(url_for("landing_page"))
+
+    if len(text) > 500:
+
+        flash("Comment too long (max 500).","error")
+
+        return redirect(url_for("landing_page"))
+
+    comments = load_comments()
+
+    comments.append({
+
+    "id": len(comments) + 1,
+
+    "name": name or "Anonymous",
+
+    "comment": text,
+
+    "created_at": datetime.datetime.now().isoformat(timespec="seconds"),
+
+    "user_id": session.get("user_id")
+
+})
+    save_comments(comments)
+
+    flash("Thank you for feedback!","success")
+
+    return redirect(url_for("landing_page"))
+@app.post("/comment/<int:comment_id>/delete")
+def delete_comment(comment_id):
+
+    if not session.get("user_id"):
+        abort(403)
+
+    comments = load_comments()
+
+    comment = next((c for c in comments if c.get("id") == comment_id), None)
+
+    if not comment:
+        abort(404)
+
+    current_id = session.get("user_id")
+    current_name = session.get("username")
+
+    if comment.get("user_id") != current_id and current_name != "admin":
+        abort(403)
+
+    comments = [c for c in comments if c.get("id") != comment_id]
+
+    save_comments(comments)
+
+    flash("Comment deleted.", "success")
+
+    return redirect(url_for("landing_page"))
 
 
 if __name__ == "__main__":
