@@ -22,7 +22,7 @@
 
       {% include '_nav.html' %}
 
-<!-- Compact header -->
+      <!-- Compact header -->
       <div class="card">
         <div class="cardBody" style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
           <div>
@@ -46,31 +46,114 @@
         <div class="card">
           <div class="cardHeader">
             <div style="font-weight:800;">Your Tasks</div>
+
             <div class="headerRight">
-              <form method="GET" action="{{ url_for('home_page') }}" class="sortForm">
-                <label class="sortLabel" for="sort">Sort</label>
-                <select id="sort" name="sort" class="sortSelect" onchange="this.form.submit()">
-                  <option value="due_asc" {% if sort=='due_asc' %}selected{% endif %}>Due date (soonest)</option>
-                  <option value="due_desc" {% if sort=='due_desc' %}selected{% endif %}>Due date (latest)</option>
-                  <option value="newest" {% if sort=='newest' %}selected{% endif %}>Created (newest)</option>
-                  <option value="oldest" {% if sort=='oldest' %}selected{% endif %}>Created (oldest)</option>
-                  <option value="status" {% if sort=='status' %}selected{% endif %}>Status (incomplete first)</option>
-                </select>
+              <!-- One form controls everything (Sort + Filters) -->
+              <form method="GET" action="{{ url_for('home_page') }}" class="filterForm">
+                <!-- Sort -->
+                <div class="filterGroup">
+                  <label class="sortLabel" for="sort">Sort</label>
+                  <select id="sort" name="sort" class="sortSelect" onchange="this.form.submit()">
+                    <option value="due_asc" {% if sort=='due_asc' %}selected{% endif %}>Due date (soonest)</option>
+                    <option value="due_desc" {% if sort=='due_desc' %}selected{% endif %}>Due date (latest)</option>
+                    <option value="newest" {% if sort=='newest' %}selected{% endif %}>Created (newest)</option>
+                    <option value="oldest" {% if sort=='oldest' %}selected{% endif %}>Created (oldest)</option>
+                    <option value="status" {% if sort=='status' %}selected{% endif %}>Status (incomplete first)</option>
+                  </select>
+                </div>
+
+                <!-- Status -->
+                <div class="filterGroup">
+                  <label class="sortLabel" for="status">Status</label>
+                  <select id="status" name="status" class="sortSelect">
+                    <option value="all" {% if status_filter=='all' %}selected{% endif %}>All</option>
+                    <option value="complete" {% if status_filter=='complete' %}selected{% endif %}>Complete</option>
+                    <option value="incomplete" {% if status_filter=='incomplete' %}selected{% endif %}>Incomplete</option>
+                  </select>
+                </div>
+
+                <!-- Search -->
+                <div class="filterGroup filterSearch">
+                  <label class="sortLabel" for="q">Search</label>
+                  <input
+                    id="q"
+                    name="q"
+                    value="{{ q }}"
+                    placeholder="title or keyword..."
+                    class="filterInput"
+                    type="text"
+                  />
+                </div>
+
+                <!-- Due exact -->
+                <div class="filterGroup">
+                  <label class="sortLabel" for="due">Due</label>
+                  <input id="due" name="due" value="{{ due }}" type="date" class="filterInput filterDate" />
+                </div>
+
+                <!-- Due range -->
+                <div class="filterGroup">
+                  <label class="sortLabel" for="due_from">From</label>
+                  <input id="due_from" name="due_from" value="{{ due_from }}" type="date" class="filterInput filterDate" />
+                </div>
+
+                <div class="filterGroup">
+                  <label class="sortLabel" for="due_to">To</label>
+                  <input id="due_to" name="due_to" value="{{ due_to }}" type="date" class="filterInput filterDate" />
+                </div>
+
+                <!-- Apply + Clear -->
+                <button class="pill" type="submit" style="border:none;">Apply</button>
+
+                <!-- Clear resets all filters but keeps sort -->
+                <a class="pill" href="{{ url_for('home_page', sort=sort) }}" style="text-decoration:none;">Clear</a>
               </form>
+
               <div class="pill">Dashboard</div>
             </div>
           </div>
 
-          <!-- ✅ Scroll happens here (inside the tasks panel) -->
+          <!-- Scroll happens here -->
           <div class="cardBody scrollArea">
-            <form method="POST" action="/tasks/add" style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:12px;">
+
+            <!-- Active filters summary -->
+            <div class="activeFilters">
+              {% if active_filters and active_filters|length > 0 %}
+                <span class="activeLabel">Active:</span>
+                <span class="activeList">{{ active_filters | join(" • ") }}</span>
+              {% else %}
+                <span class="activeMuted">No active filters.</span>
+              {% endif %}
+              <span class="activeCount">Showing <b>{{ shown_count }}</b> task(s).</span>
+            </div>
+
+            <!-- Add task form -->
+            <form method="POST" action="/tasks/add" style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:12px; align-items:center;">
+              <!-- preserve current filters across POST redirects -->
               <input type="hidden" name="sort" value="{{ sort }}"/>
+              <input type="hidden" name="status" value="{{ status_filter }}"/>
+              <input type="hidden" name="q" value="{{ q }}"/>
+              <input type="hidden" name="due" value="{{ due }}"/>
+              <input type="hidden" name="due_from" value="{{ due_from }}"/>
+              <input type="hidden" name="due_to" value="{{ due_to }}"/>
+
               <input name="title" placeholder="Task title..." required
                      style="flex:1; min-width:220px; padding:10px; border-radius:12px; border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.04); color:var(--text);" />
+
               <input name="memo" placeholder="Optional memo..."
                      style="flex:2; min-width:260px; padding:10px; border-radius:12px; border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.04); color:var(--text);" />
-              <input name="due_date" type="date" aria-label="Due date"
-                     style="min-width:170px; padding:10px; border-radius:12px; border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.04); color:var(--text);" />
+
+              <!-- Due: now matches filter date picker styling -->
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span class="sortLabel" style="min-width:28px;">Due</span>
+                <input
+                  name="due_date"
+                  type="date"
+                  aria-label="Due date"
+                  class="filterInput filterDate"
+                />
+              </div>
+
               <button class="pill" type="submit" style="border:none;">Add</button>
             </form>
 
@@ -105,11 +188,21 @@
 
                       <form method="POST" action="/tasks/{{ task.id }}/toggle" style="margin:0;">
                         <input type="hidden" name="sort" value="{{ sort }}"/>
+                        <input type="hidden" name="status" value="{{ status_filter }}"/>
+                        <input type="hidden" name="q" value="{{ q }}"/>
+                        <input type="hidden" name="due" value="{{ due }}"/>
+                        <input type="hidden" name="due_from" value="{{ due_from }}"/>
+                        <input type="hidden" name="due_to" value="{{ due_to }}"/>
                         <button class="pill" type="submit" style="border:none;">Toggle</button>
                       </form>
 
                       <form method="POST" action="/tasks/{{ task.id }}/delete" style="margin:0;" onsubmit="return confirm('Delete this task?');">
                         <input type="hidden" name="sort" value="{{ sort }}"/>
+                        <input type="hidden" name="status" value="{{ status_filter }}"/>
+                        <input type="hidden" name="q" value="{{ q }}"/>
+                        <input type="hidden" name="due" value="{{ due }}"/>
+                        <input type="hidden" name="due_from" value="{{ due_from }}"/>
+                        <input type="hidden" name="due_to" value="{{ due_to }}"/>
                         <button class="pill" type="submit" style="border:none;">Delete</button>
                       </form>
                     </div>
@@ -118,8 +211,8 @@
               {% endfor %}
             {% else %}
               <div class="empty">
-                <b>No tasks yet.</b><br/>
-                Add a few tasks to get started.
+                <b>No tasks found.</b><br/>
+                Try clearing filters or add a new task.
               </div>
             {% endif %}
           </div>
@@ -174,7 +267,7 @@
             </div>
           </div>
         </div>
-</div>
+
       </div>
     </div>
   </body>

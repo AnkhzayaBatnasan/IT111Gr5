@@ -1,0 +1,14 @@
+[
+  {
+    "id": 1,
+    "username": "zaya",
+    "email": "ankhzaya.m@outlook.com",
+    "password_hash": "pbkdf2:sha256:1000000$eX9iD4rEfg49I11l$54b5e54f9794dece0a38053a980eefd137e206393c7680dbe34a6127e7982d4e"
+  },
+  {
+    "id": 2,
+    "username": "admin",
+    "email": "admin@test.com",
+    "password_hash": "pbkdf2:sha256:1000000$dqNOklg5fud7aImM$1b624ffe890419e936e4d27bea33d25dcd345970d2f04c2e45c6c5ead9b8a914"
+  }
+]
