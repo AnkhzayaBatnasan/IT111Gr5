@@ -87,6 +87,12 @@ placeholder="Write your feedback..."
 maxlength="500"
 required></textarea>
 
+<div class="form-group">
+<label>{{ captcha_question }}</label>
+<input type="number" name="captcha" required placeholder="Your answer">
+<input type="text" name="website" style="display:none">
+</div>
+
 <button type="submit" class="pill">Submit</button>
 
 </form>
