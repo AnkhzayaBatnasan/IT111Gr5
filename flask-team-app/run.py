@@ -336,9 +336,15 @@ def landing_page():
         reverse=True                                      # Newest comments appear first
     )
 
+    import random
+    a = random.randint(1,9)
+    b = random.randint(1,9)
+    session["captcha_answer"] = str(a+b)
+
     return render_template(
         "landing.html",
-        comments=comments
+        comments=comments,
+        captcha_question=f"What is {a} + {b}?"
     )
 
 
@@ -728,6 +734,10 @@ def view_task(task_id):
 def submit_comment():
     """Add a new feedback comment from the landing page."""
     name = request.form.get("name", "").strip()
+    captcha = request.form.get("captcha","").strip()
+    if captcha != session.get("captcha_answer"):
+        flash("Verification failed. Please answer the math question.", "error")
+        return redirect(url_for("landing_page"))
     text = request.form.get("comment", "").strip()
 
     if not text:
